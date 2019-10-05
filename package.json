@@ -1,0 +1,7 @@
+{
+  "name": "vanilla-todo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A todo list with no framework",
+  "license": "MIT"
+}
