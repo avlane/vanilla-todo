@@ -29,32 +29,30 @@
       </li>`).join('');
   }
 
+  function update(next) {
+    todos = next;
+    save();
+    render();
+  }
+
   function idOf(el) {
     return Number(el.closest('li').dataset.id);
   }
 
   form.addEventListener('submit', event => {
     event.preventDefault();
-    todos.push({ id: Date.now(), title: input.value, done: false });
+    update(Todos.add(todos, input.value));
     input.value = '';
-    save();
-    render();
   });
 
   list.addEventListener('change', event => {
     if (!event.target.classList.contains('toggle')) return;
-    const id = idOf(event.target);
-    todos = todos.map(t => (t.id === id ? Object.assign({}, t, { done: !t.done }) : t));
-    save();
-    render();
+    update(Todos.toggle(todos, idOf(event.target)));
   });
 
   list.addEventListener('click', event => {
     if (!event.target.classList.contains('remove')) return;
-    const id = idOf(event.target);
-    todos = todos.filter(t => t.id !== id);
-    save();
-    render();
+    update(Todos.remove(todos, idOf(event.target)));
   });
 
   render();
