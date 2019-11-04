@@ -5,6 +5,8 @@
   const form = document.getElementById('new-form');
   const input = document.getElementById('new-title');
   const list = document.getElementById('list');
+  const footer = document.getElementById('footer');
+  const filterLinks = document.querySelectorAll('#filters a');
 
   let todos = load();
 
@@ -20,13 +22,21 @@
     localStorage.setItem(KEY, JSON.stringify(todos));
   }
 
+  function currentFilter() {
+    return Todos.parseFilter(window.location.hash);
+  }
+
   function render() {
-    list.innerHTML = todos.map(todo => `
+    list.innerHTML = Todos.visible(todos, currentFilter()).map(todo => `
       <li data-id="${todo.id}" class="${todo.done ? 'done' : ''}">
         <input class="toggle" type="checkbox" ${todo.done ? 'checked' : ''}>
         <span class="title">${todo.title}</span>
         <button class="remove" type="button" aria-label="Delete">&times;</button>
       </li>`).join('');
+    footer.hidden = todos.length === 0;
+    filterLinks.forEach(link => {
+      link.classList.toggle('selected', link.dataset.filter === currentFilter());
+    });
   }
 
   function update(next) {
@@ -55,5 +65,6 @@
     update(Todos.remove(todos, idOf(event.target)));
   });
 
+  window.addEventListener('hashchange', render);
   render();
 })();

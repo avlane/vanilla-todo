@@ -37,3 +37,19 @@ test('remove: drops the matching item', () => {
   assert.deepStrictEqual(Todos.remove(todos, 1).map(t => t.id), [2]);
   assert.strictEqual(Todos.remove(todos, 99).length, 2);
 });
+
+test('parseFilter: reads the hash', () => {
+  assert.strictEqual(Todos.parseFilter('#/active'), 'active');
+  assert.strictEqual(Todos.parseFilter('#/completed'), 'completed');
+  assert.strictEqual(Todos.parseFilter('#/'), 'all');
+  assert.strictEqual(Todos.parseFilter(''), 'all');
+  assert.strictEqual(Todos.parseFilter('#/bogus'), 'all');
+  assert.strictEqual(Todos.parseFilter(undefined), 'all');
+});
+
+test('visible: filters by state', () => {
+  const todos = [{ id: 1, title: 'a', done: false }, { id: 2, title: 'b', done: true }];
+  assert.deepStrictEqual(Todos.visible(todos, 'all').map(t => t.id), [1, 2]);
+  assert.deepStrictEqual(Todos.visible(todos, 'active').map(t => t.id), [1]);
+  assert.deepStrictEqual(Todos.visible(todos, 'completed').map(t => t.id), [2]);
+});

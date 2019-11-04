@@ -23,5 +23,19 @@
     return todos.filter(t => t.id !== id);
   }
 
-  return { nextId, add, toggle, remove };
+  const FILTERS = ['all', 'active', 'completed'];
+
+  // '#/active' -> 'active'; anything unknown means 'all'.
+  function parseFilter(hash) {
+    const name = String(hash || '').replace(/^#\/?/, '');
+    return FILTERS.includes(name) ? name : 'all';
+  }
+
+  function visible(todos, filter) {
+    if (filter === 'active') return todos.filter(t => !t.done);
+    if (filter === 'completed') return todos.filter(t => t.done);
+    return todos;
+  }
+
+  return { nextId, add, toggle, remove, parseFilter, visible };
 });
