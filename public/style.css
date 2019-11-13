@@ -81,3 +81,9 @@ h1 {
 #filters a.selected {
   border-color: #b83f45;
 }
+
+#list .edit {
+  flex: 1;
+  font: inherit;
+  padding: 0.25rem;
+}

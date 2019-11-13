@@ -53,3 +53,15 @@ test('visible: filters by state', () => {
   assert.deepStrictEqual(Todos.visible(todos, 'active').map(t => t.id), [1]);
   assert.deepStrictEqual(Todos.visible(todos, 'completed').map(t => t.id), [2]);
 });
+
+test('rename: trims and replaces the title', () => {
+  const todos = [{ id: 1, title: 'a', done: true }, { id: 2, title: 'b', done: false }];
+  const out = Todos.rename(todos, 1, '  new name  ');
+  assert.deepStrictEqual(out[0], { id: 1, title: 'new name', done: true });
+  assert.strictEqual(out[1], todos[1]);
+});
+
+test('rename: a blank title removes the todo', () => {
+  const todos = [{ id: 1, title: 'a', done: false }];
+  assert.deepStrictEqual(Todos.rename(todos, 1, '   '), []);
+});

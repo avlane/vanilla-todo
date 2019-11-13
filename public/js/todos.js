@@ -23,6 +23,13 @@
     return todos.filter(t => t.id !== id);
   }
 
+  // A blank title deletes the todo, like clearing the field in most todo apps.
+  function rename(todos, id, title) {
+    const trimmed = String(title).trim();
+    if (trimmed === '') return remove(todos, id);
+    return todos.map(t => (t.id === id ? Object.assign({}, t, { title: trimmed }) : t));
+  }
+
   const FILTERS = ['all', 'active', 'completed'];
 
   // '#/active' -> 'active'; anything unknown means 'all'.
@@ -37,5 +44,5 @@
     return todos;
   }
 
-  return { nextId, add, toggle, remove, parseFilter, visible };
+  return { nextId, add, toggle, remove, rename, parseFilter, visible };
 });

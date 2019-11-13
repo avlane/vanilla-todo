@@ -9,6 +9,7 @@
   const filterLinks = document.querySelectorAll('#filters a');
 
   let todos = load();
+  let editingId = null;
 
   function load() {
     try {
@@ -30,9 +31,13 @@
     list.innerHTML = Todos.visible(todos, currentFilter()).map(todo => `
       <li data-id="${todo.id}" class="${todo.done ? 'done' : ''}">
         <input class="toggle" type="checkbox" ${todo.done ? 'checked' : ''}>
-        <span class="title">${todo.title}</span>
+        ${todo.id === editingId
+          ? `<input class="edit" value="${todo.title}">`
+          : `<span class="title">${todo.title}</span>`}
         <button class="remove" type="button" aria-label="Delete">&times;</button>
       </li>`).join('');
+    const edit = list.querySelector('.edit');
+    if (edit) edit.focus();
     footer.hidden = todos.length === 0;
     filterLinks.forEach(link => {
       link.classList.toggle('selected', link.dataset.filter === currentFilter());
@@ -63,6 +68,31 @@
   list.addEventListener('click', event => {
     if (!event.target.classList.contains('remove')) return;
     update(Todos.remove(todos, idOf(event.target)));
+  });
+
+  function finishEdit(field, commit) {
+    const id = editingId;
+    editingId = null;
+    if (commit) update(Todos.rename(todos, id, field.value));
+    else render();
+  }
+
+  list.addEventListener('dblclick', event => {
+    if (!event.target.classList.contains('title')) return;
+    editingId = idOf(event.target);
+    render();
+  });
+
+  list.addEventListener('keydown', event => {
+    if (!event.target.classList.contains('edit')) return;
+    if (event.key === 'Enter') finishEdit(event.target, true);
+    else if (event.key === 'Escape') finishEdit(event.target, false);
+  });
+
+  list.addEventListener('focusout', event => {
+    if (event.target.classList.contains('edit') && editingId !== null) {
+      finishEdit(event.target, true);
+    }
   });
 
   window.addEventListener('hashchange', render);
