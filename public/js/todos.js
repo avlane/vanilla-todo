@@ -44,5 +44,13 @@
     return todos;
   }
 
-  return { nextId, add, toggle, remove, rename, parseFilter, visible };
+  function remaining(todos) {
+    return todos.filter(t => !t.done).length;
+  }
+
+  function clearCompleted(todos) {
+    return todos.filter(t => !t.done);
+  }
+
+  return { nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted };
 });

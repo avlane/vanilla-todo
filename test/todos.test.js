@@ -65,3 +65,14 @@ test('rename: a blank title removes the todo', () => {
   const todos = [{ id: 1, title: 'a', done: false }];
   assert.deepStrictEqual(Todos.rename(todos, 1, '   '), []);
 });
+
+test('remaining: counts open items', () => {
+  const todos = [{ id: 1, done: false }, { id: 2, done: true }, { id: 3, done: false }];
+  assert.strictEqual(Todos.remaining(todos), 2);
+  assert.strictEqual(Todos.remaining([]), 0);
+});
+
+test('clearCompleted: keeps only open items', () => {
+  const todos = [{ id: 1, done: false }, { id: 2, done: true }, { id: 3, done: false }];
+  assert.deepStrictEqual(Todos.clearCompleted(todos).map(t => t.id), [1, 3]);
+});

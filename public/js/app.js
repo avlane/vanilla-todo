@@ -6,6 +6,8 @@
   const input = document.getElementById('new-title');
   const list = document.getElementById('list');
   const footer = document.getElementById('footer');
+  const count = document.getElementById('count');
+  const clearButton = document.getElementById('clear-completed');
   const filterLinks = document.querySelectorAll('#filters a');
 
   let todos = load();
@@ -38,7 +40,10 @@
       </li>`).join('');
     const edit = list.querySelector('.edit');
     if (edit) edit.focus();
+    const left = Todos.remaining(todos);
     footer.hidden = todos.length === 0;
+    count.textContent = left + (left === 1 ? ' item left' : ' items left');
+    clearButton.hidden = left === todos.length;
     filterLinks.forEach(link => {
       link.classList.toggle('selected', link.dataset.filter === currentFilter());
     });
@@ -94,6 +99,8 @@
       finishEdit(event.target, true);
     }
   });
+
+  clearButton.addEventListener('click', () => update(Todos.clearCompleted(todos)));
 
   window.addEventListener('hashchange', render);
   render();
