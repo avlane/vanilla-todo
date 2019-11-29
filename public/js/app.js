@@ -29,17 +29,46 @@
     return Todos.parseFilter(window.location.hash);
   }
 
+  function element(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
+  function renderItem(todo) {
+    const li = element('li', todo.done ? 'done' : '');
+    li.dataset.id = todo.id;
+
+    const toggle = element('input', 'toggle');
+    toggle.type = 'checkbox';
+    toggle.checked = todo.done;
+    toggle.setAttribute('aria-label', 'Mark "' + todo.title + '" as done');
+    li.appendChild(toggle);
+
+    if (todo.id === editingId) {
+      const edit = element('input', 'edit');
+      edit.value = todo.title;
+      li.appendChild(edit);
+    } else {
+      li.appendChild(element('span', 'title', todo.title));
+    }
+
+    const remove = element('button', 'remove', '×');
+    remove.type = 'button';
+    remove.setAttribute('aria-label', 'Delete');
+    li.appendChild(remove);
+    return li;
+  }
+
   function render() {
-    list.innerHTML = Todos.visible(todos, currentFilter()).map(todo => `
-      <li data-id="${todo.id}" class="${todo.done ? 'done' : ''}">
-        <input class="toggle" type="checkbox" ${todo.done ? 'checked' : ''}>
-        ${todo.id === editingId
-          ? `<input class="edit" value="${todo.title}">`
-          : `<span class="title">${todo.title}</span>`}
-        <button class="remove" type="button" aria-label="Delete">&times;</button>
-      </li>`).join('');
+    list.textContent = '';
+    Todos.visible(todos, currentFilter()).forEach(todo => {
+      list.appendChild(renderItem(todo));
+    });
     const edit = list.querySelector('.edit');
     if (edit) edit.focus();
+
     const left = Todos.remaining(todos);
     footer.hidden = todos.length === 0;
     count.textContent = left + (left === 1 ? ' item left' : ' items left');
@@ -59,6 +88,13 @@
     return Number(el.closest('li').dataset.id);
   }
 
+  function finishEdit(field, commit) {
+    const id = editingId;
+    editingId = null;
+    if (commit) update(Todos.rename(todos, id, field.value));
+    else render();
+  }
+
   form.addEventListener('submit', event => {
     event.preventDefault();
     update(Todos.add(todos, input.value));
@@ -74,13 +110,6 @@
     if (!event.target.classList.contains('remove')) return;
     update(Todos.remove(todos, idOf(event.target)));
   });
-
-  function finishEdit(field, commit) {
-    const id = editingId;
-    editingId = null;
-    if (commit) update(Todos.rename(todos, id, field.value));
-    else render();
-  }
 
   list.addEventListener('dblclick', event => {
     if (!event.target.classList.contains('title')) return;

@@ -76,3 +76,13 @@ test('clearCompleted: keeps only open items', () => {
   const todos = [{ id: 1, done: false }, { id: 2, done: true }, { id: 3, done: false }];
   assert.deepStrictEqual(Todos.clearCompleted(todos).map(t => t.id), [1, 3]);
 });
+
+test('add: trims the title', () => {
+  assert.strictEqual(Todos.add([], '  milk \n')[0].title, 'milk');
+});
+
+test('add: ignores blank titles', () => {
+  const todos = [{ id: 1, title: 'a', done: false }];
+  assert.strictEqual(Todos.add(todos, ''), todos);
+  assert.strictEqual(Todos.add(todos, '   \t'), todos);
+});

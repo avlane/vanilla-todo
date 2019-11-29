@@ -12,7 +12,9 @@
   }
 
   function add(todos, title) {
-    return todos.concat([{ id: nextId(todos), title, done: false }]);
+    const trimmed = String(title).trim();
+    if (trimmed === '') return todos;
+    return todos.concat([{ id: nextId(todos), title: trimmed, done: false }]);
   }
 
   function toggle(todos, id) {
