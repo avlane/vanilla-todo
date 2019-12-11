@@ -10,19 +10,21 @@
   const clearButton = document.getElementById('clear-completed');
   const filterLinks = document.querySelectorAll('#filters a');
 
-  let todos = load();
+  const store = TodoStorage.create(getStorage(), KEY);
+  let todos = store.load();
   let editingId = null;
 
-  function load() {
+  // Merely reading window.localStorage can throw when site data is blocked.
+  function getStorage() {
     try {
-      return JSON.parse(localStorage.getItem(KEY)) || [];
+      return window.localStorage;
     } catch (err) {
-      return [];
+      return null;
     }
   }
 
   function save() {
-    localStorage.setItem(KEY, JSON.stringify(todos));
+    store.save(todos);
   }
 
   function currentFilter() {
