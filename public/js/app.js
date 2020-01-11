@@ -8,6 +8,7 @@
   const footer = document.getElementById('footer');
   const count = document.getElementById('count');
   const clearButton = document.getElementById('clear-completed');
+  const toggleAll = document.getElementById('toggle-all');
   const filterLinks = document.querySelectorAll('#filters a');
 
   const store = TodoStorage.create(getStorage(), KEY);
@@ -75,6 +76,8 @@
     footer.hidden = todos.length === 0;
     count.textContent = left + (left === 1 ? ' item left' : ' items left');
     clearButton.hidden = left === todos.length;
+    toggleAll.hidden = todos.length === 0;
+    toggleAll.checked = todos.length > 0 && left === 0;
     filterLinks.forEach(link => {
       link.classList.toggle('selected', link.dataset.filter === currentFilter());
     });
@@ -132,6 +135,7 @@
   });
 
   clearButton.addEventListener('click', () => update(Todos.clearCompleted(todos)));
+  toggleAll.addEventListener('change', () => update(Todos.toggleAll(todos)));
 
   window.addEventListener('hashchange', render);
   render();

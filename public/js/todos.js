@@ -54,5 +54,13 @@
     return todos.filter(t => !t.done);
   }
 
-  return { nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted };
+  // If anything is still open, finish everything; otherwise reopen everything.
+  function toggleAll(todos) {
+    const done = todos.some(t => !t.done);
+    return todos.map(t => (t.done === done ? t : Object.assign({}, t, { done })));
+  }
+
+  return {
+    nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted, toggleAll
+  };
 });

@@ -123,3 +123,17 @@ h1 {
 #filters a.selected {
   border-color: var(--accent);
 }
+
+#toggle-all {
+  margin: 0 0.5rem 0 0;
+}
+
+#new-form {
+  display: flex;
+  align-items: center;
+}
+
+#new-form #new-title {
+  flex: 1;
+  width: auto;
+}

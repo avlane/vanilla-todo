@@ -86,3 +86,14 @@ test('add: ignores blank titles', () => {
   assert.strictEqual(Todos.add(todos, ''), todos);
   assert.strictEqual(Todos.add(todos, '   \t'), todos);
 });
+
+test('toggleAll: completes everything when something is open', () => {
+  const todos = [{ id: 1, done: false }, { id: 2, done: true }];
+  assert.deepStrictEqual(Todos.toggleAll(todos).map(t => t.done), [true, true]);
+});
+
+test('toggleAll: reopens everything when all are done', () => {
+  const todos = [{ id: 1, done: true }, { id: 2, done: true }];
+  assert.deepStrictEqual(Todos.toggleAll(todos).map(t => t.done), [false, false]);
+  assert.deepStrictEqual(Todos.toggleAll([]), []);
+});
