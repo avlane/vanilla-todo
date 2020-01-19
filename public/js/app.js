@@ -59,7 +59,7 @@
 
     const remove = element('button', 'remove', '×');
     remove.type = 'button';
-    remove.setAttribute('aria-label', 'Delete');
+    remove.setAttribute('aria-label', 'Delete "' + todo.title + '"');
     li.appendChild(remove);
     return li;
   }
@@ -79,7 +79,10 @@
     toggleAll.hidden = todos.length === 0;
     toggleAll.checked = todos.length > 0 && left === 0;
     filterLinks.forEach(link => {
-      link.classList.toggle('selected', link.dataset.filter === currentFilter());
+      const selected = link.dataset.filter === currentFilter();
+      link.classList.toggle('selected', selected);
+      if (selected) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
     });
   }
 
@@ -114,6 +117,7 @@
   list.addEventListener('click', event => {
     if (!event.target.classList.contains('remove')) return;
     update(Todos.remove(todos, idOf(event.target)));
+    input.focus();
   });
 
   list.addEventListener('dblclick', event => {
