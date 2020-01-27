@@ -146,3 +146,22 @@ h1 {
 #new-title:focus {
   outline-offset: -2px;
 }
+
+#new-due {
+  margin-left: 0.5rem;
+  padding: 0.6rem;
+  font: inherit;
+  background: var(--surface);
+  color: inherit;
+  border: 1px solid var(--border);
+}
+
+.due {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.due.overdue {
+  color: var(--accent);
+  font-weight: 600;
+}

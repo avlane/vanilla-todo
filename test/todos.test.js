@@ -97,3 +97,24 @@ test('toggleAll: reopens everything when all are done', () => {
   assert.deepStrictEqual(Todos.toggleAll(todos).map(t => t.done), [false, false]);
   assert.deepStrictEqual(Todos.toggleAll([]), []);
 });
+
+test('add: keeps a valid due date and drops a bad one', () => {
+  assert.strictEqual(Todos.add([], 'a', '2020-02-01')[0].due, '2020-02-01');
+  assert.strictEqual('due' in Todos.add([], 'a', '')[0], false);
+  assert.strictEqual('due' in Todos.add([], 'a', 'tomorrow')[0], false);
+  assert.strictEqual('due' in Todos.add([], 'a')[0], false);
+});
+
+test('isOverdue: only open items before today', () => {
+  const open = { id: 1, done: false, due: '2020-01-10' };
+  assert.strictEqual(Todos.isOverdue(open, '2020-01-11'), true);
+  assert.strictEqual(Todos.isOverdue(open, '2020-01-10'), false);
+  assert.strictEqual(Todos.isOverdue(open, '2020-01-09'), false);
+  assert.strictEqual(Todos.isOverdue({ id: 1, done: true, due: '2020-01-01' }, '2020-02-01'), false);
+  assert.strictEqual(Todos.isOverdue({ id: 1, done: false }, '2020-02-01'), false);
+});
+
+test('formatDate: local date with zero padding', () => {
+  assert.strictEqual(Todos.formatDate(new Date(2020, 0, 5, 23, 59)), '2020-01-05');
+  assert.strictEqual(Todos.formatDate(new Date(2019, 11, 31, 0, 0)), '2019-12-31');
+});

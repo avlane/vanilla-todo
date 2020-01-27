@@ -4,6 +4,7 @@
   const KEY = 'vanilla-todo';
   const form = document.getElementById('new-form');
   const input = document.getElementById('new-title');
+  const dueInput = document.getElementById('new-due');
   const list = document.getElementById('list');
   const footer = document.getElementById('footer');
   const count = document.getElementById('count');
@@ -57,6 +58,13 @@
       li.appendChild(element('span', 'title', todo.title));
     }
 
+    if (todo.due) {
+      const overdue = Todos.isOverdue(todo, Todos.formatDate(new Date()));
+      const due = element('time', overdue ? 'due overdue' : 'due', todo.due);
+      due.dateTime = todo.due;
+      li.appendChild(due);
+    }
+
     const remove = element('button', 'remove', '×');
     remove.type = 'button';
     remove.setAttribute('aria-label', 'Delete "' + todo.title + '"');
@@ -105,8 +113,9 @@
 
   form.addEventListener('submit', event => {
     event.preventDefault();
-    update(Todos.add(todos, input.value));
+    update(Todos.add(todos, input.value, dueInput.value));
     input.value = '';
+    dueInput.value = '';
   });
 
   list.addEventListener('change', event => {

@@ -53,3 +53,10 @@ test('storage: without any storage the list lives in memory', () => {
   assert.strictEqual(store.save(sample), false);
   assert.deepStrictEqual(store.load(), sample);
 });
+
+test('storage: due dates survive, non-string due dates are rejected', () => {
+  const withDue = { id: 1, title: 'a', done: false, due: '2020-02-01' };
+  const badDue = { id: 2, title: 'b', done: false, due: 20200201 };
+  const store = TodoStorage.create(fakeStorage({ k: JSON.stringify([withDue, badDue]) }), 'k');
+  assert.deepStrictEqual(store.load(), [withDue]);
+});

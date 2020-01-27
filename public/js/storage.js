@@ -11,7 +11,8 @@
 
   function isValidTodo(t) {
     return Boolean(t) && typeof t === 'object' &&
-      Number.isInteger(t.id) && typeof t.title === 'string' && typeof t.done === 'boolean';
+      Number.isInteger(t.id) && typeof t.title === 'string' && typeof t.done === 'boolean' &&
+      (t.due === undefined || typeof t.due === 'string');
   }
 
   function sanitize(list) {

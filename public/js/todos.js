@@ -11,10 +11,25 @@
     return todos.reduce((max, t) => Math.max(max, t.id), 0) + 1;
   }
 
-  function add(todos, title) {
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+  // due is an optional YYYY-MM-DD string, as produced by <input type="date">.
+  function add(todos, title, due) {
     const trimmed = String(title).trim();
     if (trimmed === '') return todos;
-    return todos.concat([{ id: nextId(todos), title: trimmed, done: false }]);
+    const todo = { id: nextId(todos), title: trimmed, done: false };
+    if (DATE_RE.test(due || '')) todo.due = due;
+    return todos.concat([todo]);
+  }
+
+  function isOverdue(todo, today) {
+    return !todo.done && Boolean(todo.due) && todo.due < today;
+  }
+
+  // Local date as YYYY-MM-DD (toISOString would give the UTC date).
+  function formatDate(date) {
+    const pad = n => String(n).padStart(2, '0');
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
   }
 
   function toggle(todos, id) {
@@ -61,6 +76,7 @@
   }
 
   return {
-    nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted, toggleAll
+    nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted, toggleAll,
+    isOverdue, formatDate
   };
 });
