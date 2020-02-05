@@ -19,6 +19,27 @@
     return Array.isArray(list) ? list.filter(isValidTodo) : [];
   }
 
+  function serialize(todos) {
+    return JSON.stringify({ version: VERSION, todos }, null, 2) + '\n';
+  }
+
+  // Parses an exported file (or the old bare array). Throws a readable Error.
+  function parseImport(text) {
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      throw new Error('That file is not valid JSON.');
+    }
+    const list = Array.isArray(data) ? data : data && data.todos;
+    if (!Array.isArray(list)) throw new Error('No todo list found in that file.');
+    const todos = sanitize(list);
+    if (todos.length !== list.length) {
+      throw new Error((list.length - todos.length) + ' of ' + list.length + ' items are not valid todos.');
+    }
+    return todos;
+  }
+
   // storage is anything with getItem/setItem, or null for memory only.
   function create(storage, key) {
     let memory = [];
@@ -48,5 +69,5 @@
     };
   }
 
-  return { VERSION, isValidTodo, sanitize, create };
+  return { VERSION, isValidTodo, sanitize, serialize, parseImport, create };
 });

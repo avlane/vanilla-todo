@@ -10,6 +10,8 @@
   const count = document.getElementById('count');
   const clearButton = document.getElementById('clear-completed');
   const toggleAll = document.getElementById('toggle-all');
+  const exportButton = document.getElementById('export');
+  const importInput = document.getElementById('import');
   const filterLinks = document.querySelectorAll('#filters a');
 
   const store = TodoStorage.create(getStorage(), KEY);
@@ -149,6 +151,32 @@
 
   clearButton.addEventListener('click', () => update(Todos.clearCompleted(todos)));
   toggleAll.addEventListener('change', () => update(Todos.toggleAll(todos)));
+
+  exportButton.addEventListener('click', () => {
+    const blob = new Blob([TodoStorage.serialize(todos)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'todos.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  });
+
+  importInput.addEventListener('change', () => {
+    const file = importInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        update(TodoStorage.parseImport(String(reader.result)));
+      } catch (err) {
+        window.alert(err.message);
+      }
+      importInput.value = '';
+    };
+    reader.readAsText(file);
+  });
 
   window.addEventListener('hashchange', render);
   render();

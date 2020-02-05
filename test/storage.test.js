@@ -60,3 +60,19 @@ test('storage: due dates survive, non-string due dates are rejected', () => {
   const store = TodoStorage.create(fakeStorage({ k: JSON.stringify([withDue, badDue]) }), 'k');
   assert.deepStrictEqual(store.load(), [withDue]);
 });
+
+test('serialize and parseImport: round trip', () => {
+  const todos = [sample[0], { id: 5, title: 'with due', done: true, due: '2020-02-01' }];
+  assert.deepStrictEqual(TodoStorage.parseImport(TodoStorage.serialize(todos)), todos);
+});
+
+test('parseImport: accepts the old bare array', () => {
+  assert.deepStrictEqual(TodoStorage.parseImport(JSON.stringify(sample)), sample);
+});
+
+test('parseImport: readable errors', () => {
+  assert.throws(() => TodoStorage.parseImport('{oops'), /not valid JSON/);
+  assert.throws(() => TodoStorage.parseImport('{"version": 1}'), /No todo list/);
+  assert.throws(() => TodoStorage.parseImport('42'), /No todo list/);
+  assert.throws(() => TodoStorage.parseImport(JSON.stringify([sample[0], { id: 'x' }])), /1 of 2 items/);
+});
