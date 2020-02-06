@@ -118,3 +118,16 @@ test('formatDate: local date with zero padding', () => {
   assert.strictEqual(Todos.formatDate(new Date(2020, 0, 5, 23, 59)), '2020-01-05');
   assert.strictEqual(Todos.formatDate(new Date(2019, 11, 31, 0, 0)), '2019-12-31');
 });
+
+test('restore: puts an item back where it was', () => {
+  const todos = [{ id: 1 }, { id: 3 }];
+  assert.deepStrictEqual(Todos.restore(todos, { id: 2 }, 1).map(t => t.id), [1, 2, 3]);
+  assert.deepStrictEqual(Todos.restore(todos, { id: 0 }, 0).map(t => t.id), [0, 1, 3]);
+});
+
+test('restore: clamps the index and ignores duplicates', () => {
+  const todos = [{ id: 1 }];
+  assert.deepStrictEqual(Todos.restore(todos, { id: 2 }, 99).map(t => t.id), [1, 2]);
+  assert.deepStrictEqual(Todos.restore(todos, { id: 2 }, -5).map(t => t.id), [2, 1]);
+  assert.strictEqual(Todos.restore(todos, { id: 1 }, 0), todos);
+});

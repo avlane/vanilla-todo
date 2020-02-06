@@ -47,6 +47,13 @@
     return todos.map(t => (t.id === id ? Object.assign({}, t, { title: trimmed }) : t));
   }
 
+  // Put a removed todo back at its old index (clamped to the list).
+  function restore(todos, todo, index) {
+    if (todos.some(t => t.id === todo.id)) return todos;
+    const at = Math.max(0, Math.min(index, todos.length));
+    return todos.slice(0, at).concat([todo], todos.slice(at));
+  }
+
   const FILTERS = ['all', 'active', 'completed'];
 
   // '#/active' -> 'active'; anything unknown means 'all'.
@@ -77,6 +84,6 @@
 
   return {
     nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted, toggleAll,
-    isOverdue, formatDate
+    isOverdue, formatDate, restore
   };
 });

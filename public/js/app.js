@@ -9,6 +9,7 @@
   const footer = document.getElementById('footer');
   const count = document.getElementById('count');
   const clearButton = document.getElementById('clear-completed');
+  const undoButton = document.getElementById('undo');
   const toggleAll = document.getElementById('toggle-all');
   const exportButton = document.getElementById('export');
   const importInput = document.getElementById('import');
@@ -17,6 +18,7 @@
   const store = TodoStorage.create(getStorage(), KEY);
   let todos = store.load();
   let editingId = null;
+  const removed = [];
 
   // Merely reading window.localStorage can throw when site data is blocked.
   function getStorage() {
@@ -86,6 +88,7 @@
     footer.hidden = todos.length === 0;
     count.textContent = left + (left === 1 ? ' item left' : ' items left');
     clearButton.hidden = left === todos.length;
+    undoButton.hidden = removed.length === 0;
     toggleAll.hidden = todos.length === 0;
     toggleAll.checked = todos.length > 0 && left === 0;
     filterLinks.forEach(link => {
@@ -127,7 +130,11 @@
 
   list.addEventListener('click', event => {
     if (!event.target.classList.contains('remove')) return;
-    update(Todos.remove(todos, idOf(event.target)));
+    const id = idOf(event.target);
+    const index = todos.findIndex(t => t.id === id);
+    removed.push({ todo: todos[index], index });
+    if (removed.length > 20) removed.shift();
+    update(Todos.remove(todos, id));
     input.focus();
   });
 
@@ -149,7 +156,20 @@
     }
   });
 
+  function undo() {
+    const last = removed.pop();
+    if (last) update(Todos.restore(todos, last.todo, last.index));
+  }
+
   clearButton.addEventListener('click', () => update(Todos.clearCompleted(todos)));
+  undoButton.addEventListener('click', undo);
+  document.addEventListener('keydown', event => {
+    const typing = event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA';
+    if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !typing) {
+      event.preventDefault();
+      undo();
+    }
+  });
   toggleAll.addEventListener('change', () => update(Todos.toggleAll(todos)));
 
   exportButton.addEventListener('click', () => {
