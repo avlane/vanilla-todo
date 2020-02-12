@@ -131,3 +131,17 @@ test('restore: clamps the index and ignores duplicates', () => {
   assert.deepStrictEqual(Todos.restore(todos, { id: 2 }, -5).map(t => t.id), [2, 1]);
   assert.strictEqual(Todos.restore(todos, { id: 1 }, 0), todos);
 });
+
+test('move: forwards and backwards', () => {
+  const todos = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  assert.deepStrictEqual(Todos.move(todos, 1, 2).map(t => t.id), [2, 3, 1, 4]);
+  assert.deepStrictEqual(Todos.move(todos, 4, 0).map(t => t.id), [4, 1, 2, 3]);
+  assert.deepStrictEqual(Todos.move(todos, 2, 1).map(t => t.id), [1, 2, 3, 4]);
+});
+
+test('move: clamps, ignores unknown ids and leaves the input alone', () => {
+  const todos = [{ id: 1 }, { id: 2 }];
+  assert.deepStrictEqual(Todos.move(todos, 1, 50).map(t => t.id), [2, 1]);
+  assert.strictEqual(Todos.move(todos, 9, 0), todos);
+  assert.deepStrictEqual(todos.map(t => t.id), [1, 2]);
+});

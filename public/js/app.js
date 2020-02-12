@@ -47,6 +47,7 @@
   function renderItem(todo) {
     const li = element('li', todo.done ? 'done' : '');
     li.dataset.id = todo.id;
+    li.draggable = currentFilter() === 'all' && todo.id !== editingId;
 
     const toggle = element('input', 'toggle');
     toggle.type = 'checkbox';
@@ -154,6 +155,38 @@
     if (event.target.classList.contains('edit') && editingId !== null) {
       finishEdit(event.target, true);
     }
+  });
+
+  let dragId = null;
+
+  list.addEventListener('dragstart', event => {
+    dragId = idOf(event.target);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(dragId)); // Firefox needs data
+    event.target.classList.add('dragging');
+  });
+
+  list.addEventListener('dragover', event => {
+    if (dragId === null) return;
+    event.preventDefault();
+    list.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+    const over = event.target.closest('li');
+    if (over) over.classList.add('drop-target');
+  });
+
+  list.addEventListener('drop', event => {
+    if (dragId === null) return;
+    event.preventDefault();
+    const over = event.target.closest('li');
+    const toIndex = over ? todos.findIndex(t => t.id === Number(over.dataset.id)) : todos.length;
+    const id = dragId;
+    dragId = null;
+    update(Todos.move(todos, id, toIndex));
+  });
+
+  list.addEventListener('dragend', () => {
+    dragId = null;
+    render();
   });
 
   function undo() {

@@ -54,6 +54,17 @@
     return todos.slice(0, at).concat([todo], todos.slice(at));
   }
 
+  // Move the item with this id so that it ends up at toIndex.
+  function move(todos, id, toIndex) {
+    const from = todos.findIndex(t => t.id === id);
+    if (from === -1) return todos;
+    const out = todos.slice();
+    const item = out.splice(from, 1)[0];
+    const to = Math.max(0, Math.min(toIndex, out.length));
+    out.splice(to, 0, item);
+    return out;
+  }
+
   const FILTERS = ['all', 'active', 'completed'];
 
   // '#/active' -> 'active'; anything unknown means 'all'.
@@ -84,6 +95,6 @@
 
   return {
     nextId, add, toggle, remove, rename, parseFilter, visible, remaining, clearCompleted, toggleAll,
-    isOverdue, formatDate, restore
+    isOverdue, formatDate, restore, move
   };
 });
