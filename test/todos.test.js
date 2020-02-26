@@ -145,3 +145,25 @@ test('move: clamps, ignores unknown ids and leaves the input alone', () => {
   assert.strictEqual(Todos.move(todos, 9, 0), todos);
   assert.deepStrictEqual(todos.map(t => t.id), [1, 2]);
 });
+
+test('ids stay unique when items are added after removals', () => {
+  let todos = [];
+  for (const title of ['a', 'b', 'c']) todos = Todos.add(todos, title);
+  todos = Todos.remove(todos, 2);
+  todos = Todos.add(todos, 'd');
+  const ids = todos.map(t => t.id);
+  assert.strictEqual(new Set(ids).size, ids.length);
+  assert.deepStrictEqual(ids, [1, 3, 4]);
+});
+
+test('operations never mutate their input', () => {
+  const todos = Object.freeze([Object.freeze({ id: 1, title: 'a', done: false })]);
+  Todos.add(todos, 'b');
+  Todos.toggle(todos, 1);
+  Todos.rename(todos, 1, 'c');
+  Todos.remove(todos, 1);
+  Todos.toggleAll(todos);
+  Todos.clearCompleted(todos);
+  Todos.move(todos, 1, 0);
+  Todos.restore(todos, { id: 2 }, 0);
+});
